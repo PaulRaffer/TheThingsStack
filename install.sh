@@ -46,10 +46,15 @@ sudo chown 886:886 ./acme
 	# Custom Certificate Authority:
 		# cfssl:
 			# Go:
-cd ~/Downloads
+cd ~
 wget https://golang.org/dl/go1.14.7.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.14.7.linux-amd64.tar.gz
-export PATH=$PATH:/usr/local/go/bin
+export GOROOT=/usr/local/go
+export GOPATH=~/go
+export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+
+git clone https://github.com/cloudflare/cfssl.git $GOPATH/src/github.com/cloudflare/cfssl
+
 
 go get -u github.com/cloudflare/cfssl/cmd/...
 
