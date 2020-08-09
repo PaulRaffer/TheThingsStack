@@ -1,4 +1,6 @@
-BASEDIR=$(dirname "$0")
+SCRIPT=$(readlink -f "$0")
+SCRIPTDIR=$(dirname "$SCRIPT")
+
 
 # Preparation:
 	# Docker:
@@ -61,10 +63,10 @@ export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 
 go get -u github.com/cloudflare/cfssl/cmd/...
 
-cp "$BASEDIR/ca.json" .
+cp "$SCRIPTDIR/ca.json" .
 cfssl genkey -initca ca.json | cfssljson -bare ca
 lsb_release
-cp "$BASEDIR/cert.json" .
+cp "$SCRIPTDIR/cert.json" .
 cfssl gencert -ca ca.pem -ca-key ca-key.pem cert.json | cfssljson -bare cert
 
 mv cert-key.pem key.pem
@@ -73,13 +75,13 @@ mv cert-key.pem key.pem
 
 
 # Configuration:
-cp "$BASEDIR/docker-compose.yml" .
+cp "$SCRIPTDIR/docker-compose.yml" .
 
 mkdir ./config
 cd ./config
 mkdir ./stack
 cd ./stack
-cp "$BASEDIR/ttn-lw-stack-docker.yml" .
+cp "$SCRIPTDIR/ttn-lw-stack-docker.yml" .
 
 
 
