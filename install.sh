@@ -37,11 +37,16 @@ docker-compose --version
 
 
 
+mkdir ~/example-stack
+cd ~/example-stack
+
 # Certificates:
 	# Automatic Certificate Management (ACME):
-cd /var/lib
 mkdir ./acme
 sudo chown 886:886 ./acme
+
+	# Certificates from a Certificate Authority:
+sudo chown 886:886 ./cert.pem ./key.pem
 
 	# Custom Certificate Authority:
 		# cfssl:
@@ -49,23 +54,60 @@ sudo chown 886:886 ./acme
 cd ~
 wget https://golang.org/dl/go1.14.7.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.14.7.linux-amd64.tar.gz
+cd ~/example-stack
 export GOROOT=/usr/local/go
 export GOPATH=~/go
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 
-git clone https://github.com/cloudflare/cfssl.git $GOPATH/src/github.com/cloudflare/cfssl
-
-
 go get -u github.com/cloudflare/cfssl/cmd/...
-
-cd /run
-mkdir ./secrets
-cd ./secrets
 
 cp "$BASEDIR/ca.json" .
 cfssl genkey -initca ca.json | cfssljson -bare ca
-
+lsb_release
 cp "$BASEDIR/cert.json" .
 cfssl gencert -ca ca.pem -ca-key ca-key.pem cert.json | cfssljson -bare cert
 
 mv cert-key.pem key.pem
+
+
+
+
+# Configuration:
+cp "$BASEDIR/docker-compose.yml" .
+
+mkdir ./config
+cd ./config
+mkdir ./stack
+cd ./stack
+cp "$BASEDIR/ttn-lw-stack-docker.yml" .
+
+
+
+# Running The Things Stack:
+docker-compose pull
+
+docker-compose run --rm stack is-db init
+
+docker-compose run --rm stack is-db create-admin-user \
+  --id admin \
+  --email your@email.com
+
+docker-compose run --rm stack is-db create-oauth-client \
+  --id cli \
+  --name "Command Line Interface" \
+  --owner admin \
+  --no-secret \
+  --redirect-uri "local-callback" \
+  --redirect-uri "code"
+
+docker-compose run --rm stack is-db create-oauth-client \
+  --id console \
+  --name "Console" \
+  --owner admin \
+  --secret the secret you generated before \
+  --redirect-uri "https://thethings.example.com/console/oauth/callback" \
+  --redirect-uri "/console/oauth/callback" \
+  --logout-redirect-uri "https://thethings.example.com/console" \
+  --logout-redirect-uri "/console"
+
+docker-compose up
