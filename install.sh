@@ -65,7 +65,7 @@ go get -u github.com/cloudflare/cfssl/cmd/...
 
 cp "$SCRIPTDIR/ca.json" .
 cfssl genkey -initca ca.json | cfssljson -bare ca
-lsb_release
+
 cp "$SCRIPTDIR/cert.json" .
 cfssl gencert -ca ca.pem -ca-key ca-key.pem cert.json | cfssljson -bare cert
 
