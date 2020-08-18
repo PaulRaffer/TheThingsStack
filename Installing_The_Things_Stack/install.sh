@@ -55,7 +55,7 @@ wget https://golang.org/dl/go1.14.7.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.14.7.linux-amd64.tar.gz
 cd ~/example-stack
 export GOROOT=/usr/local/go
-export GOPATH=~/go
+export GOPATH=$HOME/go
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 
 go get -u github.com/cloudflare/cfssl/cmd/...
