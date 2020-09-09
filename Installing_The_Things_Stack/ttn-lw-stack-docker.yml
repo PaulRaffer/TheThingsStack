@@ -76,7 +76,7 @@ tls:
 #       mqtt-server: 'mqtts://thethings.example.com:8881'
 
 # Web UI configuration for "thethings.example.com":
-# console:
+console:
 #   ui:
 #     canonical-url: 'https://thethings.example.com/console'
 #     is:
@@ -94,8 +94,8 @@ tls:
 #     edtc:
 #       base-url: 'https://thethings.example.com/api/v3'
 #
-#   oauth:
+  oauth:
 #     authorize-url: 'https://thethings.example.com/oauth/authorize'
 #     token-url: 'https://thethings.example.com/oauth/token'
-#     client-id: 'console'
-#     client-secret: 'console'          # choose or generate a secret
+    client-id: 'console'
+    client-secret: 'console'          # choose or generate a secret
