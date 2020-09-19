@@ -39,40 +39,11 @@ docker-compose --version
 
 
 
+# Configuration:
+
 mkdir ~/example-stack
 cd ~/example-stack
 
-# Certificates:
-	# Automatic Certificate Management (ACME):
-mkdir ./acme
-sudo chown 886:886 ./acme
-
-	# Custom Certificate Authority:
-		# cfssl:
-			# Go:
-cd ~
-wget https://golang.org/dl/go1.14.7.linux-amd64.tar.gz
-tar -C /usr/local -xzf go1.14.7.linux-amd64.tar.gz
-cd ~/example-stack
-export GOROOT=/usr/local/go
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
-
-go get -u github.com/cloudflare/cfssl/cmd/...
-
-cp "$SCRIPTDIR/ca.json" .
-cfssl genkey -initca ca.json | cfssljson -bare ca
-
-cp "$SCRIPTDIR/cert.json" .
-cfssl gencert -ca ca.pem -ca-key ca-key.pem cert.json | cfssljson -bare cert
-
-mv cert-key.pem key.pem
-sudo chown 886:886 ./cert.pem ./key.pem
-
-
-
-
-# Configuration:
 cp "$SCRIPTDIR/docker-compose.yml" .
 
 mkdir ./config
@@ -80,6 +51,15 @@ cd ./config
 mkdir ./stack
 cd ./stack
 cp "$SCRIPTDIR/ttn-lw-stack-docker.yml" .
+
+
+
+
+# Certificates:
+	# Automatic Certificate Management (ACME):
+mkdir ./acme
+sudo chown 886:886 ./acme
+
 
 
 

@@ -3,7 +3,7 @@ services:
 
   # If using CockroachDB:
   cockroach:
-    image: cockroachdb/cockroach
+    image: cockroachdb/cockroach:latest
     command: start --http-port 26256 --insecure
     restart: unless-stopped
     volumes:
@@ -26,7 +26,7 @@ services:
   #     - "127.0.0.1:5432:5432"
 
   redis:
-    image: redis
+    image: redis:latest
     command: redis-server --appendonly yes
     restart: unless-stopped
     volumes:
@@ -35,7 +35,7 @@ services:
       - "127.0.0.1:6379:6379"
 
   stack:
-    image: thethingsnetwork/lorawan-stack
+    image: thethingsnetwork/lorawan-stack:latest
     entrypoint: ttn-lw-stack -c /config/ttn-lw-stack-docker.yml
     command: start
     restart: unless-stopped
@@ -60,8 +60,8 @@ services:
 
     ports:
       # If deploying on a public server:
-      # - "80:1885"
-      # - "443:8885"
+      - "80:1885"
+      - "443:8885"
       - "1881:1881"
       - "8881:8881"
       - "1882:1882"
@@ -77,16 +77,16 @@ services:
       - "1700:1700/udp"
 
     # If using custom certificates:
-    secrets:
-      - ca.pem
-      - cert.pem
-      - key.pem
+    # secrets:
+    #   - ca.pem
+    #   - cert.pem
+    #   - key.pem
 
 # If using custom certificates:
-secrets:
-  ca.pem:
-    file: ./ca.pem
-  cert.pem:
-    file: ./cert.pem
-  key.pem:
-    file: ./key.pem
+# secrets:
+#   ca.pem:
+#     file: ./ca.pem
+#   cert.pem:
+#     file: ./cert.pem
+#   key.pem:
+#     file: ./key.pem
