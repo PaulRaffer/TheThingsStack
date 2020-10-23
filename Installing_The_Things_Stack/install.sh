@@ -1,5 +1,7 @@
 SCRIPT=$(readlink -f "$0")
 SCRIPTDIR=$(dirname "$SCRIPT")
+SERVERADDR="$1"
+DEPLOYDIR="$2"
 
 
 # Preparation:
@@ -39,8 +41,8 @@ docker-compose --version
 
 
 
-mkdir ~/example-stack
-cd ~/example-stack
+mkdir -p $DEPLOYDIR
+cd $DEPLOYDIR
 
 # Certificates:
 	# Automatic Certificate Management (ACME):
@@ -50,10 +52,10 @@ sudo chown 886:886 ./acme
 	# Custom Certificate Authority:
 		# cfssl:
 			# Go:
-cd ~
+cd $DEPLOYDIR/..
 wget https://golang.org/dl/go1.14.7.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.14.7.linux-amd64.tar.gz
-cd ~/example-stack
+cd $DEPLOYDIR
 export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
@@ -73,13 +75,10 @@ sudo chown 886:886 ./cert.pem ./key.pem
 
 
 # Configuration:
-cp "$SCRIPTDIR/docker-compose.yml" .
+cp "$SCRIPTDIR/docker-compose.yml" $DEPLOYDIR
 
-mkdir ./config
-cd ./config
-mkdir ./stack
-cd ./stack
-cp "$SCRIPTDIR/ttn-lw-stack-docker.yml" .
+mkdir -p $DEPLOYDIR/config/stack
+cp "$SCRIPTDIR/ttn-lw-stack-docker.yml" $DEPLOYDIR/config/stack
 
 
 
