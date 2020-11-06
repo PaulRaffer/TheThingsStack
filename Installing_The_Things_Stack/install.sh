@@ -4,7 +4,7 @@ SERVERADDR="$1"
 DEPLOYDIR="$2"
 
 
-# Preparation:
+# Prerequisites:
 	# Docker:
 sudo apt-get remove docker docker-engine docker.io containerd runc
 
@@ -32,7 +32,6 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io
 sudo docker run hello-world
 
 
-
 	# Docker Compose:
 sudo curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
@@ -40,49 +39,25 @@ docker-compose --version
 
 
 
-
-mkdir -p $DEPLOYDIR
-cd $DEPLOYDIR
-
-# Certificates:
-	# Automatic Certificate Management (ACME):
-mkdir ./acme
-sudo chown 886:886 ./acme
-
-	# Custom Certificate Authority:
-		# cfssl:
-			# Go:
-cd $DEPLOYDIR/..
-wget https://golang.org/dl/go1.14.7.linux-amd64.tar.gz
-tar -C /usr/local -xzf go1.14.7.linux-amd64.tar.gz
-cd $DEPLOYDIR
-export GOROOT=/usr/local/go
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
-
-go get -u github.com/cloudflare/cfssl/cmd/...
-
-cp "$SCRIPTDIR/ca.json" .
-cfssl genkey -initca ca.json | cfssljson -bare ca
-
-cp "$SCRIPTDIR/cert.json" .
-cfssl gencert -ca ca.pem -ca-key ca-key.pem cert.json | cfssljson -bare cert
-
-mv cert-key.pem key.pem
-sudo chown 886:886 ./cert.pem ./key.pem
-
-
-
-
 # Configuration:
+mkdir -p $DEPLOYDIR
 cp "$SCRIPTDIR/docker-compose.yml" $DEPLOYDIR
 
 mkdir -p $DEPLOYDIR/config/stack
 cp "$SCRIPTDIR/ttn-lw-stack-docker.yml" $DEPLOYDIR/config/stack
+sed -i "s/thethings.example.com/$SERVERADDR/g" $DEPLOYDIR/config/stack/ttn-lw-stack-docker.yml
+
+
+
+# Certificates:
+mkdir -p $DEPLOYDIR/acme
+sudo chown 886:886 $DEPLOYDIR/acme
 
 
 
 # Running The Things Stack:
+cd $DEPLOYDIR
+
 docker-compose pull
 
 docker-compose run --rm stack is-db init
@@ -104,9 +79,9 @@ docker-compose run --rm stack is-db create-oauth-client \
   --name "Console" \
   --owner admin \
   --secret console \
-  --redirect-uri "https://thethings.example.com/console/oauth/callback" \
+  --redirect-uri "https://$SERVERADDR/console/oauth/callback" \
   --redirect-uri "/console/oauth/callback" \
-  --logout-redirect-uri "https://thethings.example.com/console" \
+  --logout-redirect-uri "https://$SERVERADDR/console" \
   --logout-redirect-uri "/console"
 
 docker-compose up
