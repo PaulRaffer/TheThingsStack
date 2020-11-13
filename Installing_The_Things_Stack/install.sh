@@ -46,12 +46,31 @@ cp "$SCRIPTDIR/docker-compose.yml" $DEPLOYDIR
 mkdir -p $DEPLOYDIR/config/stack
 cp "$SCRIPTDIR/ttn-lw-stack-docker.yml" $DEPLOYDIR/config/stack
 sed -i "s/thethings.example.com/$SERVERADDR/g" $DEPLOYDIR/config/stack/ttn-lw-stack-docker.yml
+#sed -i "s/https/http/g" $DEPLOYDIR/config/stack/ttn-lw-stack-docker.yml
 
 
 
 # Certificates:
-mkdir -p $DEPLOYDIR/acme
-sudo chown 886:886 $DEPLOYDIR/acme
+wget https://golang.org/dl/go1.14.7.linux-amd64.tar.gz
+tar -C /usr/local -xzf go1.14.7.linux-amd64.tar.gz
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+go version
+
+go get -u github.com/cloudflare/cfssl/cmd/...
+
+cd $DEPLOYDIR
+
+cp "$SCRIPTDIR/ca.json" .
+cfssl genkey -initca ca.json | cfssljson -bare ca
+
+cp "$SCRIPTDIR/cert.json" .
+sed -i "s/thethings.example.com/$SERVERADDR/g" $DEPLOYDIR/cert.json
+cfssl gencert -ca ca.pem -ca-key ca-key.pem cert.json | cfssljson -bare cert
+
+mv cert-key.pem key.pem
+sudo chown 886:886 ./cert.pem ./key.pem
 
 
 

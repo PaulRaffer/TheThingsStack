@@ -80,16 +80,16 @@ services:
       - "1700:1700/udp"
 
     # If using custom certificates:
-    # secrets:
-    #   - ca.pem
-    #   - cert.pem
-    #   - key.pem
+    secrets:
+      - ca.pem
+      - cert.pem
+      - key.pem
 
 # If using custom certificates:
-# secrets:
-#   ca.pem:
-#     file: ./ca.pem
-#   cert.pem:
-#     file: ./cert.pem
-#   key.pem:
-#     file: ./key.pem
+secrets:
+  ca.pem:
+    file: ./ca.pem
+  cert.pem:
+    file: ./cert.pem
+  key.pem:
+    file: ./key.pem
