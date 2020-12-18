@@ -2,6 +2,7 @@ SCRIPT=$(readlink -f "$0")
 SCRIPTDIR=$(dirname "$SCRIPT")
 SERVERADDR="$1"
 DEPLOYDIR="$2"
+ARCH="$3"
 
 
 # Prerequisites:
@@ -51,8 +52,8 @@ sed -i "s/thethings.example.com/$SERVERADDR/g" $DEPLOYDIR/config/stack/ttn-lw-st
 
 
 # Certificates:
-wget https://golang.org/dl/go1.14.7.linux-amd64.tar.gz
-tar -C /usr/local -xzf go1.14.7.linux-amd64.tar.gz
+wget https://golang.org/dl/go1.14.7.linux-$ARCH.tar.gz
+tar -C /usr/local -xzf go1.14.7.linux-$ARCH.tar.gz
 export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
